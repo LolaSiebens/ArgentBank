@@ -75,7 +75,7 @@ paths:
         - application/json
       responses:
         "200":
-          description: User profile retrieved successully
+          description: User profile retrieved successfully
           schema:
             $ref: "#/definitions/ApiResponse"
         "400":
@@ -105,7 +105,7 @@ paths:
         - application/json
       responses:
         "200":
-          description: User profile retrieved successully
+          description: User profile updated successfully
           schema:
             $ref: "#/definitions/ApiResponse"
         "400":
@@ -119,7 +119,10 @@ paths:
       tags:
         - User Module
       summary: User Transactions API
-      description: API for fetching all transactions for the month, dateStart, dateEnd specified
+      description: |
+        API for fetching all transactions for the month, dateStart, dateEnd specified.
+        It supports retrieving transactions for the current month by default, but also allows specifying a date range using the dateStart and dateEnd parameters.
+        Access to this endpoint requires Bearer JWT token authorization in the request header, ensuring that only authenticated users have access to their transactions.
       parameters:
         - in: header
           type: string
@@ -129,16 +132,16 @@ paths:
         - in: query
           name: dateStart
           type: string
-          description: Date start type type yyyy-mm-dd
+          description: Date start type (format: yyyy-mm-dd)
         - in: query
           name: dateEnd
-          type: integer
-          description: Date end type type yyyy-mm-dd
+          type: string
+          description: Date end type (format: yyyy-mm-dd)
       produces:
         - application/json
       responses:
         "200":
-          description: Transactions retrieved successully
+          description: Transactions retrieved successfully
           schema:
             $ref: "#/definitions/Transactions"
         "400":
@@ -152,7 +155,10 @@ paths:
       tags:
         - User Module
       summary: User Transaction id API
-      description: API for retrieve a transaction, id specified
+      description: |
+        API for retrieving details of a specific transaction by specifying the transaction ID.
+        Requires Bearer JWT token authorization in the request header to ensure that only authenticated users can access their individual transactions.
+        You can specify the transaction ID in the URL to get details of that particular transaction.
       parameters:
         - in: header
           type: string
@@ -170,18 +176,21 @@ paths:
         "200":
           schema:
             $ref: "#/definitions/Transaction"
-          description: Transaction retrieved successully
+          description: Transaction retrieved successfully
         "400":
           description: Invalid Fields
         "500":
           description: Internal Server Error
-    patch:
+    post:
       security:
         - Bearer: []
       tags:
         - User Module
-      summary: User Transaction id API
-      description: API for adding, modifying, deleting a note in a transaction, id specified
+      summary: Add Note to Transaction
+      description: |
+        API for adding a note to a specific transaction by providing the transaction ID and note data.
+        Allows users to associate custom notes with their transactions, useful for adding comments or additional descriptions.
+        Requires Bearer JWT token authorization for security.
       parameters:
         - in: header
           type: string
@@ -191,7 +200,7 @@ paths:
         - in: path
           name: id
           type: string
-          description: id of the transaction
+          description: Transaction ID
           required: true
         - in: body
           name: body
@@ -205,7 +214,75 @@ paths:
         "200":
           schema:
             $ref: "#/definitions/Transaction"
-          description: Note posted successully
+          description: Note added successfully
+        "400":
+          description: Invalid Fields
+        "500":
+          description: Internal Server Error
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Update Transaction Note
+      description: |
+        API for updating the note of a specific transaction by providing the transaction ID and note data.
+        Allows users to update the data of the note associated with a particular transaction.
+        Requires Bearer JWT token authorization for security.
+      parameters:
+        - in: header
+          type: string
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+        - in: path
+          name: id
+          type: string
+          description: Transaction ID
+          required: true
+        - in: body
+          name: body
+          description: Notes payload
+          required: true
+          schema:
+            $ref: "#/definitions/UserTransaction"
+      produces:
+        - application/json
+      responses:
+        "200":
+          schema:
+            $ref: "#/definitions/Transaction"
+          description: Note updated successfully
+        "400":
+          description: Invalid Fields
+        "500":
+          description: Internal Server Error
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Delete Transaction Note
+      description: |
+        API for deleting the note of a specific transaction by providing the transaction ID.
+        Allows users to remove a note previously associated with a transaction, if necessary.
+        Bearer JWT token authorization is required to access this feature.
+      parameters:
+        - in: header
+          type: string
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+        - in: path
+          name: id
+          type: string
+          description: Transaction ID
+          required: true
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Transaction note deleted successfully
         "400":
           description: Invalid Fields
         "500":
