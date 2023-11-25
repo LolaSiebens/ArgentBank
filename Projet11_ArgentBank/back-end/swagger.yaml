@@ -112,43 +112,7 @@ paths:
           description: Invalid Fields
         "500":
           description: Internal Server Error
-  /user/transactions:
-    get:
-      security:
-        - Bearer: []
-      tags:
-        - User Module
-      summary: User Transactions API
-      description: |
-        API for fetching all transactions for the month, dateStart, dateEnd specified.
-        It supports retrieving transactions for the current month by default, but also allows specifying a date range using the dateStart and dateEnd parameters.
-        Access to this endpoint requires Bearer JWT token authorization in the request header, ensuring that only authenticated users have access to their transactions.
-      parameters:
-        - in: header
-          type: string
-          name: Authorization
-          description: Attach Bearer JWT token
-          required: true
-        - in: query
-          name: dateStart
-          type: string
-          description: Date start type (format: yyyy-mm-dd)
-        - in: query
-          name: dateEnd
-          type: string
-          description: Date end type (format: yyyy-mm-dd)
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: Transactions retrieved successfully
-          schema:
-            $ref: "#/definitions/Transactions"
-        "400":
-          description: Transactions not found
-        "500":
-          description: Internal Server Error
-  /user/transactions/{id}:
+ 
     get:
       security:
         - Bearer: []
@@ -275,6 +239,208 @@ paths:
           required: true
         - in: path
           name: id
+          type: string
+          description: Transaction ID
+          required: true
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Transaction note deleted successfully
+        "400":
+          description: Invalid Fields
+        "500":
+          description: Internal Server Error
+  /user/account/{accountId}/transactions:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User Account Transactions API
+      description: |
+        API for fetching transactions for a specific account with optional type filtering.
+      parameters:
+        - in: header
+          type: string
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+        - in: path
+          name: accountId
+          type: string
+          description: The account id
+          required: true
+        - in: query
+          name: type
+          type: string
+          description: Transaction type (cheque, epargne, carte_credit, etc.)
+        - in: query
+          name: dateStart
+          type: string
+          description: Date start type (format: yyyy-mm-dd)
+        - in: query
+          name: dateEnd
+          type: string
+          description: Date end type (format: yyyy-mm-dd)
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Transactions retrieved successfully
+          schema:
+            $ref: "#/definitions/Transactions"
+        "400":
+          description: Transactions not found
+        "500":
+          description: Internal Server Error
+  /user/account/{accountId}/transactions/{transactionId}:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User Transaction id API
+      description: |
+        API for retrieving details of a specific transaction by specifying the transaction ID.
+        Requires Bearer JWT token authorization in the request header to ensure that only authenticated users can access their individual transactions.
+        You can specify the transaction ID in the URL to get details of that particular transaction.
+      parameters:
+        - in: header
+          type: string
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+        - in: path
+          name: accountId
+          type: integer
+          required: true
+          description: The account id
+        - in: path
+          name: transactionId
+          type: integer
+          required: true
+          description: The transaction id
+      produces:
+        - application/json
+      responses:
+        "200":
+          schema:
+            $ref: "#/definitions/Transaction"
+          description: Transaction retrieved successfully
+        "400":
+          description: Invalid Fields
+        "500":
+          description: Internal Server Error
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Add Note to Transaction
+      description: |
+        API for adding a note to a specific transaction by providing the transaction ID and note data.
+        Allows users to associate custom notes with their transactions, useful for adding comments or additional descriptions.
+        Requires Bearer JWT token authorization for security.
+      parameters:
+        - in: header
+          type: string
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+        - in: path
+          name: accountId
+          type: string
+          description: Account ID
+          required: true
+        - in: path
+          name: transactionId
+          type: string
+          description: Transaction ID
+          required: true
+        - in: body
+          name: body
+          description: Notes payload
+          required: true
+          schema:
+            $ref: "#/definitions/UserTransaction"
+      produces:
+        - application/json
+      responses:
+        "200":
+          schema:
+            $ref: "#/definitions/Transaction"
+          description: Note added successfully
+        "400":
+          description: Invalid Fields
+        "500":
+          description: Internal Server Error
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Update Transaction Note
+      description: |
+        API for updating the note of a specific transaction by providing the transaction ID and note data.
+        Allows users to update the data of the note associated with a particular transaction.
+        Requires Bearer JWT token authorization for security.
+      parameters:
+        - in: header
+          type: string
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+        - in: path
+          name: accountId
+          type: string
+          description: Account ID
+          required: true
+        - in: path
+          name: transactionId
+          type: string
+          description: Transaction ID
+          required: true
+        - in: body
+          name: body
+          description: Notes payload
+          required: true
+          schema:
+            $ref: "#/definitions/UserTransaction"
+      produces:
+        - application/json
+      responses:
+        "200":
+          schema:
+            $ref: "#/definitions/Transaction"
+          description: Note updated successfully
+        "400":
+          description: Invalid Fields
+        "500":
+          description: Internal Server Error
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Delete Transaction Note
+      description: |
+        API for deleting the note of a specific transaction by providing the transaction ID.
+        Allows users to remove a note previously associated with a transaction, if necessary.
+        Bearer JWT token authorization is required to access this feature.
+      parameters:
+        - in: header
+          type: string
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+        - in: path
+          name: accountId
+          type: string
+          description: Account ID
+          required: true
+        - in: path
+          name: transactionId
           type: string
           description: Transaction ID
           required: true
